@@ -13,7 +13,6 @@ toLocalTime <- function(Date.Time){
 }
 
 # Example
-x <- c("2014-11-07T14:12:03.9917315143+01","2014-11-07T14:12:03.9917315143Z")
-toLocalTime(x)$Date
-toLocalTime(x)$Time
-
+# x <- c("2014-11-07T14:12:03.9917315143+01","2014-11-07T14:12:03.9917315143Z")
+# toLocalTime(x)$Date
+# toLocalTime(x)$Time
