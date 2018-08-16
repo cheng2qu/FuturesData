@@ -5,7 +5,7 @@ require(lubridate)
 
 
 # Function to compress gz file
-source("Z:/Documents/R/gzcp-GZCompress.R")
+source("gzcp-GZCompress.R")
 
 # setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/")
 
@@ -13,7 +13,7 @@ source("Z:/Documents/R/gzcp-GZCompress.R")
 closestDepth <- function(tradeSecond, depthSecond, tradeDate) {
   
   # Half trading day according to the trading calendar
-  halfTradeDay <- read.table("Z:/Documents/Futures rollover/Half-trading days.txt", header = TRUE)
+  halfTradeDay <- read.table("Half-trading days.txt", header = TRUE)
   halfTradeDay$Date <- as.character(halfTradeDay$Date)
   
   if (tradeDate %in% halfTradeDay$Date & tradeSecond>=min(depthSecond)) {    
@@ -44,7 +44,7 @@ closestDepth <- function(tradeSecond, depthSecond, tradeDate) {
 # Function searching for closest matched trade -----------------------
 closestTrade <- function(tradeSecond, trade2Second, tradeDate) {
   # Half trading day according to the trading calendar
-  halfTradeDay <- read.table("Z:/Documents/Futures rollover/Half-trading days.txt", header = TRUE)
+  halfTradeDay <- read.table("Half-trading days.txt", header = TRUE)
   halfTradeDay$Date <- as.character(halfTradeDay$Date)
   
   if (tradeDate %in% halfTradeDay$Date & tradeSecond>=min(trade2Second)) {    
