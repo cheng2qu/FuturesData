@@ -1,8 +1,5 @@
 require(data.table)
 require(ff)
-require(stringi)
-require(lubridate)
-
 
 # Function to compress gz file
 source("gzcp-GZCompress.R")
@@ -88,10 +85,11 @@ loadTrades <- function(fileDir){
   # Load data with fread, requiring to add 7 Zip to the system path
   comTrade <- fread(input = paste0("7z x -so ", fileDir), header = TRUE, check.names=T)
   
-  # Split Date and Time, then create the variable Second
-  comTrade <- comTrade[, Date := substr(Date.Time,1,10)]
-  comTrade <- comTrade[, Time := sub("T", "", sub("^[^T]*", "", Date.Time))]
-  
+  # Split Date and Time from local exchange time, then create the variable Second
+  comTrade <- comTrade[, Date := toLocalTime(Date.Time)$Date]
+  comTrade <- comTrade[, Time := toLocalTime(Date.Time)$Time]
+  comTrade <- comTrade[order(comTrade$Date,comTrade$Time)]
+    
   comTrade$Second <- strptime(comTrade$Time, format = "%H:%M:%OS", tz = "")$hour*3600+
     strptime(comTrade$Time, format = "%H:%M:%OS", tz = "")$min*60+
     strptime(comTrade$Time, format = "%H:%M:%OS", tz = "")$sec
