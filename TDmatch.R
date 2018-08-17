@@ -16,7 +16,68 @@ min.n <- function(x,n) {
   }
 }
 
+# Function to move quotes when trading through-----
+ttDepth <- function(side, depthBefore) {
+  if (side=="B") {
+    depthAfter <- cbind(depthBefore[,c("L2.BidPrice", "L2.BidSize", "L1.AskPrice", "L1.AskSize",
+                                       "L3.BidPrice", "L3.BidSize", "L2.AskPrice", "L2.AskSize",
+                                       "L4.BidPrice", "L4.BidSize", "L3.AskPrice", "L3.AskSize",
+                                       "L5.BidPrice", "L5.BidSize", "L4.AskPrice", "L4.AskSize",
+                                       "L6.BidPrice", "L6.BidSize", "L5.AskPrice", "L5.AskSize",
+                                       "L7.BidPrice", "L7.BidSize", "L6.AskPrice", "L6.AskSize",
+                                       "L8.BidPrice", "L8.BidSize", "L7.AskPrice", "L7.AskSize",
+                                       "L9.BidPrice", "L9.BidSize", "L8.AskPrice", "L8.AskSize",
+                                       "L10.BidPrice", "L10.BidSize", "L9.AskPrice", "L9.AskSize")],
+                        "L11.BidPrice"=as.numeric(NA), "L11.BidSize"=as.numeric(NA),
+                        depthBefore[, c("L10.AskPrice", "L10.AskSize")])
+  }
+  if (side=="A"){
+    depthAfter <- cbind(depthBefore[,c("L1.BidPrice", "L1.BidSize", "L2.AskPrice", "L2.AskSize",
+                                       "L2.BidPrice", "L2.BidSize", "L3.AskPrice", "L3.AskSize",
+                                       "L3.BidPrice", "L3.BidSize", "L4.AskPrice", "L4.AskSize",
+                                       "L4.BidPrice", "L4.BidSize", "L5.AskPrice", "L5.AskSize",
+                                       "L5.BidPrice", "L5.BidSize", "L6.AskPrice", "L6.AskSize",
+                                       "L6.BidPrice", "L6.BidSize", "L7.AskPrice", "L7.AskSize",
+                                       "L7.BidPrice", "L7.BidSize", "L8.AskPrice", "L8.AskSize",
+                                       "L8.BidPrice", "L8.BidSize", "L9.AskPrice", "L9.AskSize",
+                                       "L9.BidPrice", "L9.BidSize", "L10.AskPrice", "L10.AskSize",
+                                       "L10.BidPrice", "L10.BidSize")],
+                        "L11.AskPrice"=as.numeric(NA), "L11.AskSize"=as.numeric(NA))
+  }
+  colnames(depthAfter) <- c("L1.BidPrice", "L1.BidSize", "L1.AskPrice", "L1.AskSize",
+                            "L2.BidPrice", "L2.BidSize", "L2.AskPrice", "L2.AskSize",
+                            "L3.BidPrice", "L3.BidSize", "L3.AskPrice", "L3.AskSize",
+                            "L4.BidPrice", "L4.BidSize", "L4.AskPrice", "L4.AskSize",
+                            "L5.BidPrice", "L5.BidSize", "L5.AskPrice", "L5.AskSize",
+                            "L6.BidPrice", "L6.BidSize", "L6.AskPrice", "L6.AskSize",
+                            "L7.BidPrice", "L7.BidSize", "L7.AskPrice", "L7.AskSize",
+                            "L8.BidPrice", "L8.BidSize", "L8.AskPrice", "L8.AskSize",
+                            "L9.BidPrice", "L9.BidSize", "L9.AskPrice", "L9.AskSize",
+                            "L10.BidPrice", "L10.BidSize", "L10.AskPrice", "L10.AskSize")
+  return(depthAfter)
+}
+
+# Function to append column-----
+appendCol <- function(data, col2append, file2write){
+  if (!file.exists(file2write)){
+    # If file doesn't exist, only save data
+    gzcp0(fileDir = file2write, Cont = data)
+  } else {
+    # If file exist, moving on
+    # Read file
+    dataOld <- fread(input = paste0("7z x -so ", file2write), header = TRUE, check.names=T)
+    if(!col2append %in% colnames(dataOld)) {
+      # If the column hasn't beed attached
+      # Attach column
+      dataNew <- cbind(dataOld,data[,..col2append])
+      # Save new file
+      gzcp0(fileDir = file2write, Cont = dataNew)
+    }
+  }
+}
+
 # Function to match reg depth with reg trades -----------------------
+# Example data
 # longTrade <- loadTrades("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/OMXS30V7_2017-10-02.csv.gz")
 # longDepthFile <- "E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/OMXS30V7_2017-10-02.csv.gz"
 tdRegMatch <- function(longTrade, folderDepth) {
@@ -309,66 +370,6 @@ tdRegMatch <- function(longTrade, folderDepth) {
   
   comTrade <- comTrade[Price==bestBid, initiate := "Sell"][Price==bestAsk, initiate := "Buy"]
   return(comTrade)
-}
-
-# Function to move quotes when trading through-----
-ttDepth <- function(side, depthBefore) {
-  if (side=="B") {
-    depthAfter <- cbind(depthBefore[,c("L2.BidPrice", "L2.BidSize", "L1.AskPrice", "L1.AskSize",
-                                       "L3.BidPrice", "L3.BidSize", "L2.AskPrice", "L2.AskSize",
-                                       "L4.BidPrice", "L4.BidSize", "L3.AskPrice", "L3.AskSize",
-                                       "L5.BidPrice", "L5.BidSize", "L4.AskPrice", "L4.AskSize",
-                                       "L6.BidPrice", "L6.BidSize", "L5.AskPrice", "L5.AskSize",
-                                       "L7.BidPrice", "L7.BidSize", "L6.AskPrice", "L6.AskSize",
-                                       "L8.BidPrice", "L8.BidSize", "L7.AskPrice", "L7.AskSize",
-                                       "L9.BidPrice", "L9.BidSize", "L8.AskPrice", "L8.AskSize",
-                                       "L10.BidPrice", "L10.BidSize", "L9.AskPrice", "L9.AskSize")],
-                        "L11.BidPrice"=as.numeric(NA), "L11.BidSize"=as.numeric(NA),
-                        depthBefore[, c("L10.AskPrice", "L10.AskSize")])
-  }
-  if (side=="A"){
-    depthAfter <- cbind(depthBefore[,c("L1.BidPrice", "L1.BidSize", "L2.AskPrice", "L2.AskSize",
-                                       "L2.BidPrice", "L2.BidSize", "L3.AskPrice", "L3.AskSize",
-                                       "L3.BidPrice", "L3.BidSize", "L4.AskPrice", "L4.AskSize",
-                                       "L4.BidPrice", "L4.BidSize", "L5.AskPrice", "L5.AskSize",
-                                       "L5.BidPrice", "L5.BidSize", "L6.AskPrice", "L6.AskSize",
-                                       "L6.BidPrice", "L6.BidSize", "L7.AskPrice", "L7.AskSize",
-                                       "L7.BidPrice", "L7.BidSize", "L8.AskPrice", "L8.AskSize",
-                                       "L8.BidPrice", "L8.BidSize", "L9.AskPrice", "L9.AskSize",
-                                       "L9.BidPrice", "L9.BidSize", "L10.AskPrice", "L10.AskSize",
-                                       "L10.BidPrice", "L10.BidSize")],
-                        "L11.AskPrice"=as.numeric(NA), "L11.AskSize"=as.numeric(NA))
-  }
-  colnames(depthAfter) <- c("L1.BidPrice", "L1.BidSize", "L1.AskPrice", "L1.AskSize",
-                            "L2.BidPrice", "L2.BidSize", "L2.AskPrice", "L2.AskSize",
-                            "L3.BidPrice", "L3.BidSize", "L3.AskPrice", "L3.AskSize",
-                            "L4.BidPrice", "L4.BidSize", "L4.AskPrice", "L4.AskSize",
-                            "L5.BidPrice", "L5.BidSize", "L5.AskPrice", "L5.AskSize",
-                            "L6.BidPrice", "L6.BidSize", "L6.AskPrice", "L6.AskSize",
-                            "L7.BidPrice", "L7.BidSize", "L7.AskPrice", "L7.AskSize",
-                            "L8.BidPrice", "L8.BidSize", "L8.AskPrice", "L8.AskSize",
-                            "L9.BidPrice", "L9.BidSize", "L9.AskPrice", "L9.AskSize",
-                            "L10.BidPrice", "L10.BidSize", "L10.AskPrice", "L10.AskSize")
-  return(depthAfter)
-}
-
-# Function to append column-----
-appendCol <- function(data, col2append, file2write){
-  if (!file.exists(file2write)){
-    # If file doesn't exist, only save data
-    gzcp0(fileDir = file2write, Cont = data)
-  } else {
-    # If file exist, moving on
-    # Read file
-    dataOld <- fread(input = paste0("7z x -so ", file2write), header = TRUE, check.names=T)
-    if(!col2append %in% colnames(dataOld)) {
-      # If the column hasn't beed attached
-      # Attach column
-      dataNew <- cbind(dataOld,data[,..col2append])
-      # Save new file
-      gzcp0(fileDir = file2write, Cont = dataNew)
-    }
-  }
 }
 
 # Function to match trades and depth for spread trades-------------------
