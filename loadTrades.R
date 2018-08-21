@@ -4,8 +4,23 @@
 
 require(ff)
 require(data.table)
-source("toLocalTime.R")
-# Function to load data
+
+# Function to convert UTC offset time to local time----
+toLocalTime <- function(Date.Time){
+  # Input Date.Time format as "yyyy-mm-ddThh:mm:OSz"
+  op <- options(digits.secs=6) # Set format of fractional second
+  localDateTime <- with_tz(parse_date_time2(Date.Time, "YmdHMOSz"), tzone = "")
+  Date <- substr(localDateTime,1,10)
+  Time <- substr(localDateTime,12,27)
+  return(data.frame("Date" = Date, "Time" = Time))
+}
+
+# Example
+# x <- c("2014-11-07T14:12:03.9917315143+01","2014-11-07T14:12:03.9917315143Z")
+# toLocalTime(x)$Date
+# toLocalTime(x)$Time
+
+# Function to load data----
 loadTrades <- function(fileDir){
   # Load data with fread, requiring to add 7 Zip to the system path
   comTrade <- fread(input = paste0("7z x -so ", fileDir), header = TRUE, check.names=T)
