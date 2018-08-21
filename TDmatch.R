@@ -1,6 +1,10 @@
 require(data.table)
 require(ff)
 
+Sys.setenv(PATH = paste(Sys.getenv("PATH"),
+                        "C:\\Program Files\\7-Zip",
+                        sep = ";"))
+
 # Function to compress gz file
 source("gzcp-GZCompress.R")
 source("loadTrades.R")
