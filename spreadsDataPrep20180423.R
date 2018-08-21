@@ -6,14 +6,14 @@ Sys.setenv(PATH = paste(Sys.getenv("PATH"),
                         sep = ";"))
 
 # Load R file to clean compiled data for reg trades and depth
-source("Z:/Documents/Futures rollover/largeFileReadwSkip.R")
+source("largeFileReadwSkip.R")
 # Load functions for comTDMatch, regTDMatch, and srTDMatch
-source("Z:/Documents/Futures rollover/TDmatch.R")
+source("TDmatch.R")
 
 # 0.Apply function to split regular trades and depth data-----
 # New folders for split files are needed
-tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth.csv.gz")
-tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ.csv.gz")
+tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/longPeriod/20180813_Futures_Depth.csv.gz")
+tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/longPeriod/20180813_Futures_TAQ.csv.gz")
 
 # Compress csv files to gz files
 setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/")
