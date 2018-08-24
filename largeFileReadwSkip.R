@@ -17,6 +17,9 @@ Sys.setenv(PATH = paste(Sys.getenv("PATH"),
 largeFileRead <- function(largeFile) {
   colNames <- colnames(fread(input = paste0("7z x -so ", largeFile), header = TRUE, nrows = 10, check.names=T))
   
+  # Create the path for split files
+  dir.create(sub(".csv.gz","/", largeFile), showWarnings = FALSE) 
+  
   # Through N lines
   N <- 100000
   
@@ -35,9 +38,9 @@ largeFileRead <- function(largeFile) {
     
     NR <- nrow(trade.sample)
     # Drop quotes and trades with non-positive price
-    if (grepl("Trade", largeFile)) {
-       trade.sample <- trade.sample[Type!="Quote" & Price>0,]
-    }
+    # if (grepl("Trade", largeFile)) {
+    #    trade.sample <- trade.sample[Type!="Quote" & Price>0,]
+    # }
    
     # Fill trading date
     trade.sample <- trade.sample[, Date:=substr(Date.Time,1,10)]
