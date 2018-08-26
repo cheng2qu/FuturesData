@@ -61,25 +61,6 @@ ttDepth <- function(side, depthBefore) {
   return(depthAfter)
 }
 
-# Function to append column-----
-appendCol <- function(data, col2append, file2write){
-  if (!file.exists(file2write)){
-    # If file doesn't exist, only save data
-    gzcp0(fileDir = file2write, Cont = data)
-  } else {
-    # If file exist, moving on
-    # Read file
-    dataOld <- fread(input = paste0("7z x -so ", file2write), header = TRUE, check.names=T)
-    if(!col2append %in% colnames(dataOld)) {
-      # If the column hasn't beed attached
-      # Attach column
-      dataNew <- cbind(dataOld,data[,..col2append])
-      # Save new file
-      gzcp0(fileDir = file2write, Cont = dataNew)
-    }
-  }
-}
-
 # Function to match reg depth with reg trades -----------------------
 # Example data
 # longTrade <- loadTrades("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/OMXS30V7_2017-10-02.csv.gz")
