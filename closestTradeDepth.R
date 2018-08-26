@@ -4,7 +4,7 @@
 require(data.table)
 
 # function to fix trading session----
-ifDiffSession <- function(tradeDate,tradeSec,depthSec){
+ifDiffSession <- function(tradeSec,depthSec, tradeDate){
   # Half trading day according to the trading calendar
   halfTradeDay <- read.table("Half-trading days.txt", header = TRUE)
   halfTradeDay$Date <- as.character(halfTradeDay$Date)
