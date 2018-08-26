@@ -16,11 +16,11 @@ tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/longPeriod/20180813_Futures_De
 tem <- largeFileRead("E:/FMM/OMXS30Futures/TRTHv2/longPeriod/20180813_Futures_TAQ.csv.gz")
 
 # Compress csv files to gz files
-setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/")
-sapply(list.files("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/"), function(x) system(paste0("gzip ",x), wait = FALSE))
-
-setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/")
-sapply(list.files("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/"), function(x) system(paste0("gzip ",x), wait = FALSE))
+# setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/")
+# sapply(list.files("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularDepth/"), function(x) system(paste0("gzip ",x), wait = FALSE))
+# 
+# setwd("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/")
+# sapply(list.files("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/RegularTAQ/"), function(x) system(paste0("gzip ",x), wait = FALSE))
 
 # 1.Match spreads trades and depth-------------
 # Load data of spreads trades, which are complied in a single file
