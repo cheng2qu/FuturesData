@@ -1,7 +1,7 @@
 # Load compiled trading and depth data (2-4GB)
 
 require(data.table)
-
+source("gzcp-GZCompress.R")
 # Add 7.zip into the PATH for uncompressing
 Sys.setenv(PATH = paste(Sys.getenv("PATH"),
                         "C:\\Program Files\\7-Zip",
@@ -46,14 +46,18 @@ largeFileRead <- function(largeFile) {
     trade.sample <- trade.sample[, Date:=substr(Date.Time,1,10)]
 
     # Write the subsets of data, in .txt/.csv format
-    trade.sample[, fwrite(x = trade.sample[.I],
-                          file=sub(".csv.gz",paste0("/", X.RIC[1], "_", Date[1], ".csv"), largeFile),
-                          append = TRUE,
-                          row.names = FALSE,
-                          col.names = !file.exists(sub(".csv.gz",paste0("/", X.RIC[1], "_", Date[1], ".csv"), largeFile)),
-                          sep = ","),
-                 by = .(X.RIC, Date)]
     
+    # trade.sample[, fwrite(x = trade.sample[.I],
+    #                       file=sub(".csv.gz",paste0("/", X.RIC[1], "_", Date[1], ".csv"), largeFile),
+    #                       append = TRUE,
+    #                       row.names = FALSE,
+    #                       col.names = !file.exists(sub(".csv.gz",paste0("/", X.RIC[1], "_", Date[1], ".csv"), largeFile)),
+    #                       sep = ","),
+    #              by = .(X.RIC, Date)]
+    
+    trade.sample[, gzcp0(data = trade.sample[.I],
+                         fileDir = sub(".csv.gz",paste0("/", X.RIC[1], "_", Date[1], ".csv.gz"), largeFile)),
+                 by = .(X.RIC, Date)]
     # Test the number of rows for each RIC on each trading day
     # trade.sample[, nrow(trade.sample[.I]), by = .(X.RIC, Date)]
     
