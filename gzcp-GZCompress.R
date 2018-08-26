@@ -1,34 +1,43 @@
 require(data.table)
-require(ff)
-# Function write and compress data -----------------------
-# Appending rows
-gzcp <- function(fileDir, Cont) {
-  zzfil <- fileDir
-  if (file.exists(zzfil)) {
-    x <- read.table(gzfile(fileDir), sep = ",",header = TRUE) # Load existing data
-  } else {
-    x <- Cont[0,]
-  }
-  
-  zz <- gzfile(zzfil, "w")  # compressed file
-  write.table(x, file = zz, sep = ",", append = TRUE, col.names = TRUE, row.names = FALSE)
-  write.table(Cont, file = zz, sep = ",", append = TRUE, col.names = FALSE, row.names = FALSE)
-  close(zz)
-}
+library(R.utils)
+
+Sys.setenv(PATH = paste(Sys.getenv("PATH"),
+                        "C:\\Program Files\\7-Zip",
+                        sep = ";"))
 
 # Function write and compress data -----------------------
-# Appending columns
-gzcp0 <- function(fileDir, Cont) {
-  zzfil <- fileDir
-  if (file.exists(zzfil)) {
-    x <- read.table(gzfile(fileDir), sep = ",",header = TRUE) # Load existing data
-    if (length(setdiff(colnames(Cont), colnames(x)))>0) {
-      x[[setdiff(colnames(Cont), colnames(x))]] <- Cont[[setdiff(colnames(Cont), colnames(x))]]
-      Cont <- x
+# Appending rows
+gzcp0 <- function(fileDir, data){
+  
+  if (file.exists(fileDir)) {
+    x <- fread(input = paste0("7z x -so ", fileDir), header = TRUE, check.names=T) # Load existing data
+    
+    fwrite(x, file = sub(".gz","",fileDir), append = TRUE)
+    fwrite(data, file = sub(".gz","",fileDir), append = TRUE)
+    gzip(sub(".gz","",fileDir), destname=fileDir, overwrite = TRUE)
+  } else {
+    fwrite(data, file = sub(".gz","",fileDir), append = TRUE)
+    gzip(sub(".gz","",fileDir), destname=fileDir, overwrite = TRUE)
+  }
+}
+
+# Function to append column-----
+appendCol <- function(data, col2append, file2write){
+  
+  if (!file.exists(file2write)){
+    # If file doesn't exist, only save data
+    gzcp0(fileDir = file2write, data = data)
+  } else {
+    # If file exist, moving on
+    # Read file
+    dataOld <- fread(input = paste0("7z x -so ", file2write), header = TRUE, check.names=T)
+    if(!col2append %in% colnames(dataOld)) {
+      # If the column hasn't beed attached
+      # Attach column
+      dataNew <- cbind(dataOld,data[,..col2append])
+      # Save new file
+      fwrite(dataNew, file = sub(".gz","",file2write), append = FALSE)
+      gzip(sub(".gz","",file2write), destname=file2write, overwrite = TRUE)
     }
   }
-  
-  zz <- gzfile(zzfil, "w")  # compressed file
-  write.table(Cont, file = zz, sep = ",", append = FALSE, col.names = TRUE, row.names = FALSE)
-  close(zz)
 }
