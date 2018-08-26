@@ -97,5 +97,7 @@ loadTrades <- function(fileDir){
     comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
     comTrade <- comTrade[, chgAsk :=-diff(L1.AskSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
   }
+  
+  comTrade$Date <- as.character(comTrade$Date)
   return(comTrade)
 }
