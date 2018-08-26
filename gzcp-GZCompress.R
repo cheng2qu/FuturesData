@@ -12,7 +12,7 @@ gzcp0 <- function(fileDir, data){
   if (file.exists(fileDir)) {
     x <- fread(input = paste0("7z x -so ", fileDir), header = TRUE, check.names=T) # Load existing data
     
-    fwrite(x, file = sub(".gz","",fileDir), append = TRUE)
+    fwrite(x, file = sub(".gz","",fileDir), append = FALSE)
     fwrite(data, file = sub(".gz","",fileDir), append = TRUE)
     gzip(sub(".gz","",fileDir), destname=fileDir, overwrite = TRUE)
   } else {
