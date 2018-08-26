@@ -51,7 +51,7 @@ loadTrades <- function(fileDir){
   # Drop redundant variables for TAQ data
   if(grepl("TAQ", fileDir)) {
     # Mark delayed delivery
-    comTrade <- comTrade[grepl("221\\[IRGCOND\\]", Qualifiers) | grepl("230\\[IRGCOND\\]", Qualifiers), Type = "offExchange"]
+    comTrade <- comTrade[grepl("221\\[IRGCOND\\]", Qualifiers) | grepl("230\\[IRGCOND\\]", Qualifiers), Type := "offExchange"]
     
     # Drop other vairables
     comTrade <- comTrade[, .(X.RIC, Type, Price, Volume, Date, Time, Second)] # Off-exchange negociation mark is kept in the variable Type
