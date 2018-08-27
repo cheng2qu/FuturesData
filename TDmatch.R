@@ -124,6 +124,9 @@ tdRegMatch <- function(longTrade, folderDepth) {
     
         # If no match for the first trade, try with the closest match
         indexDepth <- which.max((comDepth$Second-comTrade$Second[i])[(comDepth$Second-comTrade$Second[i])<=0])
+        if (length(indexDepth)==0){
+          next
+          }
         # Exclude matching cross trading session
         if(ifDiffSession(comTrade[i,Second],comDepth[indexDepth,Second],comTrade[i,Date])) {
           comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- NA
