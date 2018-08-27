@@ -1185,7 +1185,7 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
   # fwrite(comTrade, file = "comRegTD.csv",
   #        row.names=FALSE, col.names = !file.exists("comRegTD.csv"), sep=",", append = FALSE)
   comRegFile <- paste0(comRegDir, comTrade$X.RIC[1],"_",comTrade$Date[1],"_","comRegTD.csv.gz")
-  gzcp0(fileDir = comRegFile, Cont = comTrade)
+  gzcp0(fileDir = comRegFile, data = comTrade)
   
   # Save results of long/short leg trade file
   # File dir of trade data, using new direction
