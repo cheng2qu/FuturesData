@@ -89,12 +89,13 @@ tdRegMatch <- function(longTrade, folderDepth) {
   # Matching with interval between chg. of depth where the trade happens
   for (i in 1:nrow(comTrade)) { #nrow(comTrade)
     # Skip matched lines
-    if (!is.na(comTrade$L1.BidPrice[i])) next
+    if (!is.na(comTrade$L1.BidPrice[i]) | comTrade$Type=="offExchange") next
     
     if(i==1){
       # If start from pre-trade or normal session
       tradeStart <- c(8*3600+30*60, 8*3600+55*60)[1+(comTrade$Second[i]>=8*3600+55*60)]
       
+      # Matching with exact price and size
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
                             comDepth$Date == comTrade$Date[i]&
                             comDepth$Second <= comTrade$Second[i]&
@@ -103,27 +104,33 @@ tdRegMatch <- function(longTrade, folderDepth) {
                                (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
                                (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i]) |
                                (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
+      
       if(length(indexDepth)==0){
+        # Matching with price interval and ignore the size
         indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
                               comDepth$Date == comTrade$Date[i]&
                               comDepth$Second <= comTrade$Second[i]&
                               (comDepth$Second - comTrade$Second[i])>=(tradeStart - comTrade$Second[i])&
                               comDepth$L1.BidPrice<=comTrade$Price[i] & comDepth$L1.AskPrice>=comTrade$Price[i])
       }
+      
       if (length(indexDepth)>=1) {
+        # Assign the values if find matches
         indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
         comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
         comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-      }
-      next
-    }
+        next
+      } else {
     
-    # Exclude matching cross trading session
-    indexDepth <- which.max((comDepth$Second-comTrade$Second[i])[(comDepth$Second-comTrade$Second[i])<=0])
-    if(ifDiffSession(comTrade[i,Date],comTrade[i,Second],comDepth[indexDepth,Second])) {
-      comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- NA
-      comTrade[i][,(L10Depths)] <- NA
-      next
+        # If no match for the first trade, try with the closest match
+        indexDepth <- which.max((comDepth$Second-comTrade$Second[i])[(comDepth$Second-comTrade$Second[i])<=0])
+        # Exclude matching cross trading session
+        if(ifDiffSession(comTrade[i,Second],comDepth[indexDepth,Second],comTrade[i,Date])) {
+          comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- NA
+          comTrade[i][,(L10Depths)] <- NA
+          next
+        }
+      }
     }
     
     # Find the index of depth change by same date, same time interval between chg. of depth, price, and vol.
