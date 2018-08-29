@@ -132,6 +132,8 @@ tdRegMatch <- function(longTrade, folderDepth) {
           comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- NA
           comTrade[i][,(L10Depths)] <- NA
           next
+        } else {
+          next
         }
       }
     }
