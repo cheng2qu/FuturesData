@@ -21,7 +21,8 @@ ifDiffSession <- function(tradeSec,depthSec, tradeDate){
 # from all the depth records according to trade second
 closestDepth <- function(tradeSecond, depthSecond, tradeDate) {
 
-   if (tradeSecond>=min(depthSecond)) {
+  ind <- NA
+  if (tradeSecond>=min(depthSecond)) {
     ind <- which.max((depthSecond-tradeSecond)[(depthSecond-tradeSecond)<=0]) # Find the index of the closest quote before
     
     if (ifDiffSession(tradeSecond, depthSecond[ind], tradeDate)) {
