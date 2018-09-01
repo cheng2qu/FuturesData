@@ -911,7 +911,7 @@ tdComMatch = function(comTrade, comDepth, output){
   
   ##-------1.f. Final approx. match by last depth -------
   if (length(which(is.na(comTrade$L1.BidPrice)))>0) {
-    matchIndex <- unlist(sapply(comTrade$Second[which(is.na(comTrade$L1.BidPrice))], closestDepth, depth=comDepth$Second, tradeDate=comTrade$Date[which(is.na(comTrade$L1.BidPrice))]))
+    matchIndex <- unlist(sapply(comTrade$Second[which(is.na(comTrade$L1.BidPrice))], closestDepth, depthSecond=comDepth$Second, tradeDate=comTrade$Date[which(is.na(comTrade$L1.BidPrice))]))
     if (length(matchIndex)>0) {
       comTrade[which(is.na(comTrade$L1.BidPrice))[which(!is.na(matchIndex))], c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[matchIndex[which(!is.na(matchIndex))], c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
       comTrade[which(is.na(comTrade$L1.BidPrice))[which(!is.na(matchIndex))]][,(L10Depths)] <- comDepth[matchIndex[which(!is.na(matchIndex))], ..L10Depths]
@@ -1154,8 +1154,8 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
         comTrade[childNum][,(shortL10Depths)] <- shortTrade[spreads$shortIndex[1], ..L10Depths]
       } else {
         # print(paste0(comTrade$X.RIC[1],"_",comTrade$Date[1],"_",i))
-        longIndex <- closestDepth(comTrade$Second[i],longTrade$Second, comTrade$Date[i])
-        shortIndex <- closestDepth(comTrade$Second[i],shortTrade$Second, comTrade$Date[i])
+        longIndex <- closestTrade(comTrade$Second[i],longTrade$Second, comTrade$Date[i])
+        shortIndex <- closestTrade(comTrade$Second[i],shortTrade$Second, comTrade$Date[i])
         
         longIndex <- longIndex[which(!is.na(longIndex))]
         shortIndex <- shortIndex [which(!is.na(shortIndex))]
