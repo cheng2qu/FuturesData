@@ -121,18 +121,16 @@ tdRegMatch <- function(longTrade, folderDepth) {
         comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
         next
       } else {
-    
+        
         # If no match for the first trade, try with the closest match
-        indexDepth <- which.max((comDepth$Second-comTrade$Second[i])[(comDepth$Second-comTrade$Second[i])<=0])
+        indexDepth <- closestDepth(tradeSecond=comTrade$Second[i], depthSecond=comDepth$Second, tradeDate=comTrade$Date[i])
+                                   
         if (length(indexDepth)==0){
           next
-          }
-        # Exclude matching cross trading session
-        if(ifDiffSession(comTrade[i,Second],comDepth[indexDepth,Second],comTrade[i,Date])) {
-          comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- NA
-          comTrade[i][,(L10Depths)] <- NA
-          next
         } else {
+          indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
+          comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
+          comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
           next
         }
       }
@@ -291,19 +289,19 @@ tdRegMatch <- function(longTrade, folderDepth) {
           indexDepth <- max(indexDepth)
           if(!is.na(comDepth[indexDepth, L2.BidPrice]) & !is.na(comDepth[indexDepth, L1.AskPrice])){
             if(comDepth[indexDepth, L2.BidPrice]<=comTrade$Price[i] & comDepth[indexDepth, L1.AskPrice]>=comTrade$Price[i]) {
-            comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L2.BidPrice","L1.AskPrice","L2.BidSize","chgAsk")]
-            comTrade[i][,(L10Depths)] <-  cbind(comDepth[indexDepth, c("L2.BidPrice", "L2.BidSize", "L1.AskPrice", "L1.AskSize",
-                                                                       "L3.BidPrice", "L3.BidSize", "L2.AskPrice", "L2.AskSize",
-                                                                       "L4.BidPrice", "L4.BidSize", "L3.AskPrice", "L3.AskSize",
-                                                                       "L5.BidPrice", "L5.BidSize", "L4.AskPrice", "L4.AskSize",
-                                                                       "L6.BidPrice", "L6.BidSize", "L5.AskPrice", "L5.AskSize",
-                                                                       "L7.BidPrice", "L7.BidSize", "L6.AskPrice", "L6.AskSize",
-                                                                       "L8.BidPrice", "L8.BidSize", "L7.AskPrice", "L7.AskSize",
-                                                                       "L9.BidPrice", "L9.BidSize", "L8.AskPrice", "L8.AskSize",
-                                                                       "L10.BidPrice", "L10.BidSize", "L9.AskPrice", "L9.AskSize")],
-                                                "empty1"=NA, "empty2"=NA,
-                                                comDepth[indexDepth, c("L10.AskPrice", "L10.AskSize")])
-            next
+              comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L2.BidPrice","L1.AskPrice","L2.BidSize","chgAsk")]
+              comTrade[i][,(L10Depths)] <-  cbind(comDepth[indexDepth, c("L2.BidPrice", "L2.BidSize", "L1.AskPrice", "L1.AskSize",
+                                                                         "L3.BidPrice", "L3.BidSize", "L2.AskPrice", "L2.AskSize",
+                                                                         "L4.BidPrice", "L4.BidSize", "L3.AskPrice", "L3.AskSize",
+                                                                         "L5.BidPrice", "L5.BidSize", "L4.AskPrice", "L4.AskSize",
+                                                                         "L6.BidPrice", "L6.BidSize", "L5.AskPrice", "L5.AskSize",
+                                                                         "L7.BidPrice", "L7.BidSize", "L6.AskPrice", "L6.AskSize",
+                                                                         "L8.BidPrice", "L8.BidSize", "L7.AskPrice", "L7.AskSize",
+                                                                         "L9.BidPrice", "L9.BidSize", "L8.AskPrice", "L8.AskSize",
+                                                                         "L10.BidPrice", "L10.BidSize", "L9.AskPrice", "L9.AskSize")],
+                                                  "empty1"=NA, "empty2"=NA,
+                                                  comDepth[indexDepth, c("L10.AskPrice", "L10.AskSize")])
+              next
             }
           }
           
@@ -353,7 +351,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
         comTrade[indexTrade, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
         comTrade[indexTrade][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
       } else{
-        indexDepth <- which.max((comDepth$Second - comTrade$Second[i])[(comDepth$Second - comTrade$Second[i])<=0])
+        indexDepth <- closestDepth(tradeSecond=comTrade$Second[i], depthSecond=comDepth$Second, tradeDate=comTrade$Date[i])
         comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
       }
     }
