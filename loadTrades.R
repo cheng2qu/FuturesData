@@ -80,7 +80,7 @@ loadTrades <- function(fileDir){
   
   # Drop redundant variables for Depth data
   if(grepl("Depth", fileDir)) {
-    comTrade <- comTrade[which(!is.na(comTrade[, ..L10Depths])), 
+    comTrade <- comTrade[, 
                          .(X.RIC, Type, Date, Time, Second,
                            L1.BidPrice, L1.BidSize, L1.AskPrice, L1.AskSize,
                            L2.BidPrice, L2.BidSize, L2.AskPrice, L2.AskSize,
@@ -92,6 +92,8 @@ loadTrades <- function(fileDir){
                            L8.BidPrice, L8.BidSize, L8.AskPrice, L8.AskSize,
                            L9.BidPrice, L9.BidSize, L9.AskPrice, L9.AskSize,
                            L10.BidPrice, L10.BidSize, L10.AskPrice, L10.AskSize)]
+    
+    comTrade <- comTrade[! apply( comTrade[, ..L10Depths] , 1 , function(x) all(is.na(x)) ) , ]
     
     # Chg. of depth as approx for trading volume
     comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
