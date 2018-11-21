@@ -2,10 +2,10 @@
 # Use function toLocalTime
 # Mark off-exchange negotiation with qualifier 221[IRGCOND] and 230[IRGCOND]
 
-require(ff)
+require(ff) # Memory-efficient storage of large data
 require(data.table)
-require(stringi)
-require(lubridate)
+require(stringi) # Character string processing
+require(lubridate) # For date-time parsing function
 
 # Function to convert UTC offset time to local time----
 toLocalTime <- function(Date.Time){
