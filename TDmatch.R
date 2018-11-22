@@ -148,8 +148,9 @@ tdRegMatch <- function(longTrade, folderDepth) {
                              (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
     
     # 2. Match to next depth if no trades happen in the interval====
+    # Does it work? Does it take the depth for the next trade
     if (length(indexDepth)==0) {
-      indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
+      indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
                             comDepth$Date == comTrade$Date[i]&
                             comDepth$Second > comTrade$Second[i]&
                             (comDepth$Second - comTrade$Second[i])<(comTrade$Second[i+1] - comDepth$Second)&
@@ -157,8 +158,8 @@ tdRegMatch <- function(longTrade, folderDepth) {
                                (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
                                (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i])|
                                (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
-      
-      indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]& 
+
+      indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]&
                                 comDepth$Date == comTrade$Date[i+1]&
                                 comDepth$Second <= comTrade$Second[i+1]&
                                 (comDepth$Second - comTrade$Second[i+1])>=(comTrade$Second[i] - comTrade$Second[i+1])&
