@@ -28,12 +28,10 @@ appendCol <- function(data, col2append, file2write){
     # If file doesn't exist, only save data
     gzcp0(fileDir = file2write, data = data)
   } else {
-    # If file exist, moving on
-    # Read file
+    # If file exist, read file
     dataOld <- fread(input = paste0("7z x -so ", file2write), header = TRUE, check.names=T)
     if(!col2append %in% colnames(dataOld)) {
-      # If the column hasn't beed attached
-      # Attach column
+      # If the column doesn't exist, attach column
       dataNew <- cbind(dataOld,data[,..col2append])
       # Save new file
       fwrite(dataNew, file = sub(".gz","",file2write), append = FALSE)
