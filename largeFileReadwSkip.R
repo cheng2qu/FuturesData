@@ -15,6 +15,8 @@ Sys.setenv(PATH = paste(Sys.getenv("PATH"),
 # fread("7z e OMXS30SpreadTQ.csv.gz")
 
 largeFileRead <- function(largeFile) {
+  
+  # Obtain column names
   colNames <- colnames(fread(input = paste0("7z x -so ", largeFile), header = TRUE, nrows = 10, check.names=T))
   
   # Create the path for split files
