@@ -149,26 +149,26 @@ tdRegMatch <- function(longTrade, folderDepth) {
     
     # 2. Match to next depth if no trades happen in the interval====
     # Does it work? Does it take the depth for the next trade
-    if (length(indexDepth)==0) {
-      indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
-                            comDepth$Date == comTrade$Date[i]&
-                            comDepth$Second > comTrade$Second[i]&
-                            (comDepth$Second - comTrade$Second[i])<(comTrade$Second[i+1] - comDepth$Second)&
-                            ((comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$chgBid==comTrade$Volume[i]) |
-                               (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
-                               (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i])|
-                               (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
-
-      indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]&
-                                comDepth$Date == comTrade$Date[i+1]&
-                                comDepth$Second <= comTrade$Second[i+1]&
-                                (comDepth$Second - comTrade$Second[i+1])>=(comTrade$Second[i] - comTrade$Second[i+1])&
-                                ((comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$chgBid==comTrade$Volume[i+1]) |
-                                   (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$chgAsk==comTrade$Volume[i+1])|
-                                   (comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$L1.BidSize==comTrade$Volume[i+1]) |
-                                   (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$L1.AskSize==comTrade$Volume[i+1])))
-      indexDepth <- indexDepth[!indexDepth %in% indexDepthNext]
-    }
+    # if (length(indexDepth)==0) {
+    #   indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
+    #                         comDepth$Date == comTrade$Date[i]&
+    #                         comDepth$Second > comTrade$Second[i]&
+    #                         (comDepth$Second - comTrade$Second[i])<(comTrade$Second[i+1] - comDepth$Second)&
+    #                         ((comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$chgBid==comTrade$Volume[i]) |
+    #                            (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
+    #                            (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i])|
+    #                            (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
+    # 
+    #   indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]&
+    #                             comDepth$Date == comTrade$Date[i+1]&
+    #                             comDepth$Second <= comTrade$Second[i+1]&
+    #                             (comDepth$Second - comTrade$Second[i+1])>=(comTrade$Second[i] - comTrade$Second[i+1])&
+    #                             ((comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$chgBid==comTrade$Volume[i+1]) |
+    #                                (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$chgAsk==comTrade$Volume[i+1])|
+    #                                (comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$L1.BidSize==comTrade$Volume[i+1]) |
+    #                                (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$L1.AskSize==comTrade$Volume[i+1])))
+    #   indexDepth <- indexDepth[!indexDepth %in% indexDepthNext]
+    # }
     
     # 3.No match at quotes, try quote bounds====
     if (length(indexDepth)==0) {
@@ -195,12 +195,14 @@ tdRegMatch <- function(longTrade, folderDepth) {
     # 5.No depth between two trades====
     if (length(indexDepth)==0) {
       if (length(which(comDepth$Second >= comTrade$Second[i-1] & comDepth$Second <= comTrade$Second[i]))==0) {
+        # If the trade is between the same depth interval as the previous trade
+        # Consider the same depth value if price is unchange
         if (comTrade$Price[i-1]==comTrade$Price[i]) {
           comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("bestBid", "bestAsk", "chgBid", "chgAsk")]
           comTrade[i][,(L10Depths)] <- comTrade[i-1,..L10Depths]
           next
         } else {
-          # Consider same depth
+          # Consider the same depth value if price bound is unchange
           if(!is.na(comTrade[i-1, L1.BidPrice]) & !is.na(comTrade[i-1, L1.AskPrice])) {
             if(comTrade[i-1, L1.BidPrice]<=comTrade$Price[i] &  comTrade[i-1, L1.AskPrice]>=comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L1.BidPrice","L1.AskPrice","L1.BidSize","chgAsk")]
@@ -208,7 +210,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
               next
             }
           }
-          # If there is no depth between two trades, try to find match cross depths
+          # If there is no depth between two trades, consider matching cross depths
           if(!is.na(comTrade[i-1, L2.BidPrice])) {
             if(comTrade[i-1, L2.BidPrice]==comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L2.BidPrice","L1.AskPrice","L2.BidSize","chgAsk")]
