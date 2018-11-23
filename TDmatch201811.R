@@ -241,10 +241,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
               comTrade[i][,(L10Depths)] <- ttDepth("A", comTrade[i-1][,(L10Depths)])
               next
             }
-          } #else{
-          #   comTrade[i][,(L10Depths)] <- comTrade[i-1, ..L10Depths]
-          # }
-        }
+          }
       } else{
         # If trade through the depth in between
         indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
@@ -274,42 +271,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
       }
     }
     
-    # If more than one potential matching depth
-    if (length(indexDepth)>=1) {
-      indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
-      comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
-      comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-    } else {
-      # If there is any match, find the series trades potentially from the same chg. of depth and same price
-      indexDepth <-  which(comDepth$X.RIC == comTrade$X.RIC[i]& 
-                             comDepth$Date == comTrade$Date[i]&
-                             comDepth$Second <= comTrade$Second[i]&
-                             (comDepth$Second - comTrade$Second[i])>=(comTrade$Second[i-1] - comTrade$Second[i]))
-      if(length(indexDepth)>1) {
-        indexDepth <- max(indexDepth)
-      }
-      indexTrade <- which(comTrade$X.RIC==comTrade$X.RIC[i] &
-                            comTrade$Date==comTrade$Date[i] &
-                            comTrade$Second>=comTrade$Second[i] &
-                            abs(comTrade$Second-comTrade$Second[i])<=0.01 &
-                            abs(comTrade$Price-comTrade$Price[i])<=0.05)
-      
-      matchTrade <- which(comDepth[indexDepth, L1.BidPrice]<=comTrade$Price[indexTrade] & 
-                            comDepth[indexDepth, L1.AskPrice]>=comTrade$Price[indexTrade])
-      if (length(matchTrade)>0) {
-        comTrade[indexTrade, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
-        comTrade[indexTrade][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-      } else{
-        indexDepth <- which.max((comDepth$Second - comTrade$Second[i])[(comDepth$Second - comTrade$Second[i])<=0])
-        comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-      }
-    }
-    # indexDepthLast <- indexDepth # Keep last index
-    indexDepth <- NULL
-    # which(is.na(comTrade$L1.BidPrice))
-    # unmatch <- comTrade[which(comTrade$Price<comTrade$L1.BidPrice|comTrade$Price>comTrade$L1.AskPrice|is.na(comTrade$L1.AskPrice)),]
-    # length(which(is.na(comTrade$L1.BidPrice)))
-    # length(which((comTrade$Price<comTrade$L1.BidPrice|comTrade$Price>comTrade$L1.AskPrice) & comTrade$Volume>=100))
+    # If there is still no match, discuss later
   }
   
   comTrade <- comTrade[Price==bestBid, initiate := "Sell"][Price==bestAsk, initiate := "Buy"]
