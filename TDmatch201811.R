@@ -148,28 +148,28 @@ tdRegMatch <- function(longTrade, folderDepth) {
                              (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
                              (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i]) |
                              (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
-    
-    # 2. Match to next depth if no trades happen in the interval====
-    if (length(indexDepth)==0) {
-      indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
-                            comDepth$Date == comTrade$Date[i]&
-                            comDepth$Second > comTrade$Second[i]&
-                            (comDepth$Second - comTrade$Second[i])<(comTrade$Second[i+1] - comDepth$Second)&
-                            ((comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$chgBid==comTrade$Volume[i]) |
-                               (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
-                               (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i])|
-                               (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
-      
-      indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]& 
-                                comDepth$Date == comTrade$Date[i+1]&
-                                comDepth$Second <= comTrade$Second[i+1]&
-                                (comDepth$Second - comTrade$Second[i+1])>=(comTrade$Second[i] - comTrade$Second[i+1])&
-                                ((comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$chgBid==comTrade$Volume[i+1]) |
-                                   (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$chgAsk==comTrade$Volume[i+1])|
-                                   (comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$L1.BidSize==comTrade$Volume[i+1]) |
-                                   (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$L1.AskSize==comTrade$Volume[i+1])))
-      indexDepth <- indexDepth[!indexDepth %in% indexDepthNext]
-    }
+    # 
+    # # 2. Match to next depth if no trades happen in the interval====
+    # if (length(indexDepth)==0) {
+    #   indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
+    #                         comDepth$Date == comTrade$Date[i]&
+    #                         comDepth$Second > comTrade$Second[i]&
+    #                         (comDepth$Second - comTrade$Second[i])<(comTrade$Second[i+1] - comDepth$Second)&
+    #                         ((comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$chgBid==comTrade$Volume[i]) |
+    #                            (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
+    #                            (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i])|
+    #                            (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
+    #   
+    #   indexDepthNext <- which(comDepth$X.RIC == comTrade$X.RIC[i+1]& 
+    #                             comDepth$Date == comTrade$Date[i+1]&
+    #                             comDepth$Second <= comTrade$Second[i+1]&
+    #                             (comDepth$Second - comTrade$Second[i+1])>=(comTrade$Second[i] - comTrade$Second[i+1])&
+    #                             ((comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$chgBid==comTrade$Volume[i+1]) |
+    #                                (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$chgAsk==comTrade$Volume[i+1])|
+    #                                (comDepth$L1.BidPrice==comTrade$Price[i+1] & comDepth$L1.BidSize==comTrade$Volume[i+1]) |
+    #                                (comDepth$L1.AskPrice==comTrade$Price[i+1] & comDepth$L1.AskSize==comTrade$Volume[i+1])))
+    #   indexDepth <- indexDepth[!indexDepth %in% indexDepthNext]
+    # }
     
     # 3.No match at quotes, try quote bounds====
     if (length(indexDepth)==0) {
