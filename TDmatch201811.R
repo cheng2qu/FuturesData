@@ -471,6 +471,7 @@ tdComMatch = function(comTrade, comDepth, output){
   }
   
   ##----------- 1.c.New enter orders --------------------
+  # The best bid/ask price still match, but the change of order need adjust from the second-level of new depth
   if (length(which(is.na(comTrade$L1.BidPrice)))>0) {
     for (i in which(is.na(comTrade$L1.BidPrice))) {
       
@@ -502,7 +503,10 @@ tdComMatch = function(comTrade, comDepth, output){
                                                                             comDepth[indexDepth, c("L1.BidSize","L1.AskSize")] - comDepth[indexDepth+1, c("L1.BidSize","L2.AskSize")])
         }
         comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-      } else {
+        next
+      } 
+      
+      if (length(indexDepth)==0) {
         # For those without match, try again using around time
         indexDepth <-  which(comDepth$Date.L.==comTrade$Date.L.[i]&
                                comDepth$Second-comTrade$Second[i] >-0.5 & comDepth$Second-comTrade$Second[i] < 0.5&
@@ -527,7 +531,9 @@ tdComMatch = function(comTrade, comDepth, output){
                                                                               comDepth[indexDepth, c("L1.BidSize","L1.AskSize")] - comDepth[indexDepth+1, c("L1.BidSize","L2.AskSize")])
           }
           comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
+          next
         } 
+        
         if (length(indexDepth)==0){
           # For those without match, try again using around time to Depth_{t-1}
           
@@ -551,6 +557,7 @@ tdComMatch = function(comTrade, comDepth, output){
                                                                                 comDepth[indexDepth-1, c("L1.BidSize","L1.AskSize")] - comDepth[indexDepth, c("L1.BidSize","L2.AskSize")])
             }
             comTrade[i][,(L10Depths)] <- comDepth[indexDepth-1, ..L10Depths]
+            next
           }
         }
       }
@@ -603,7 +610,7 @@ tdComMatch = function(comTrade, comDepth, output){
           # i <- which(is.na(comTrade$L1.BidPrice))[which(which(is.na(comTrade$L1.BidPrice))==i) + splitIndex] # Move on before fill in the match
           comTrade[indexTrade[1:splitIndex]][,(L10Depths)] <- comDepth[d, ..L10Depths]
           break
-        } else {
+          } else {
           # Trying last depth, Price_t = L1.Quote_{t-1}=L2.Quote_{t}
           splitIndex <- which((comTrade$X.RIC==comTrade$X.RIC[i] &
                                  comTrade$Date==comTrade$Date[i] &
