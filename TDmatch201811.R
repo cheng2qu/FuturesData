@@ -324,7 +324,9 @@ tdComMatch = function(comTrade, comDepth, output){
       indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
       comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
       comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-    } else {
+      next
+    } 
+    if (length(indexDepth)==0) {
       # If there is no fully match, try to find match of split trades with same date, same time interval between chg. of depth, and price
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]& 
                             comDepth$Date == comTrade$Date[i]&
@@ -352,13 +354,14 @@ tdComMatch = function(comTrade, comDepth, output){
         if (length(splitIndex)>0) {
           comTrade[indexTrade[1:splitIndex], c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
           comTrade[indexTrade[1:splitIndex]][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
+          next
         }
       }
-      indexDepth <- NULL # Reset the index
     }
-  }
+  }# Finish the first matching loop
   
   ##----------- 1.b.Simple around match --------------------
+  # Start a new matching loop
   # If no match, considering split trades
   if (length(which(is.na(comTrade$L1.BidPrice)))>0) {
     
@@ -379,7 +382,9 @@ tdComMatch = function(comTrade, comDepth, output){
         indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
         comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
         comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-      } else {
+        next
+        }
+      if (length(indexDepth)==0) {
         # For those without match, try again by searching Depth_{t-1}
         # Finding close time match in depth
         indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
@@ -392,7 +397,9 @@ tdComMatch = function(comTrade, comDepth, output){
         if (length(indexDepth)==1){
           comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth-1, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
           comTrade[i][,(L10Depths)] <- comDepth[indexDepth-1, ..L10Depths]
-        } else {
+          next
+        }
+        if (length(indexDepth)==0) {
           # Considering split orders around time
           indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
                                 comDepth$Date==comTrade$Date[i]&
@@ -417,7 +424,8 @@ tdComMatch = function(comTrade, comDepth, output){
               # i <- which(is.na(comTrade$L1.BidPrice))[which(which(is.na(comTrade$L1.BidPrice))==i) + splitIndex] # Move on before fill in the match
               comTrade[indexTrade[1:splitIndex], c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
               comTrade[indexTrade[1:splitIndex]][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
-              break}
+              next
+              }
           }
         }
       }
@@ -459,7 +467,6 @@ tdComMatch = function(comTrade, comDepth, output){
           comTrade[indexTrade[1:splitIndex]][,(L10Depths)] <- comDepth[d-1, ..L10Depths]
           break}
       }
-      # }
     }
   }
   
@@ -481,13 +488,14 @@ tdComMatch = function(comTrade, comDepth, output){
       
       if (length(indexDepth)==1) {
         if (!is.na(comDepth$L2.BidPrice[indexDepth+1]) & !is.na(comDepth$L2.BidSize[indexDepth+1])) {
+          # If bid side matches
           if (comDepth$L1.BidPrice[indexDepth]==comTrade$Price[i] &
               comDepth$L2.BidPrice[indexDepth+1]==comTrade$Price[i] &
               comDepth$L2.BidSize[indexDepth+1]==comDepth$L1.BidSize[indexDepth] - comTrade$Volume[i]) {
-            # If bid side matches
+            
             comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- cbind(comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice")],
                                                                               comDepth[indexDepth, c("L1.BidSize","L1.AskSize")] - comDepth[indexDepth+1, c("L2.BidSize","L1.AskSize")])
-          }
+            }
         } else {
           # Otherwise ask side matches
           comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- cbind(comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice")],
