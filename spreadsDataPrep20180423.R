@@ -32,13 +32,12 @@ comDepth <- loadTrades("E:/FMM/OMXS30Futures/TRTHv2/longPeriod/20180813_Spread_D
 # comFullTrade <- comTrade
 # comFullDepth <- comDepth
 
-comTrade <- comFullTrade[grepl("^OMXS30G2-H2", comFullTrade$X.RIC) & (grepl("^2012-02-17", comFullTrade$Date)),]
-comDepth <- comFullDepth[grepl("^OMXS30G2-H2", comFullDepth$X.RIC) & (grepl("^2012-02-17", comFullDepth$Date)),]
+# comTrade <- comFullTrade[grepl("^OMXS30M6-N6", comFullTrade$X.RIC) & (grepl("^2016-05-23", comFullTrade$Date)),]
+# comDepth <- comFullDepth[grepl("^OMXS30G2-H2", comFullDepth$X.RIC) & (grepl("^2012-02-17", comFullDepth$Date)),]
 
 # comTrade <- comFullTrade
 # comDepth <- comFullDepth
 
-# 2.Match the orderbook of spread trades------
 # Apply matching function
 comTrade[, tdComMatch(comTrade = comTrade[.I], 
                       comDepth = comDepth[which(comDepth$X.RIC == comTrade$X.RIC[.I[1]] & comDepth$Date==comTrade$Date[.I[1]]),],
@@ -47,14 +46,14 @@ comTrade[, tdComMatch(comTrade = comTrade[.I],
 system("gzip E:/FMM/OMXS30Futures/TRTHv2/longPeriod/comTrade_5depth.csv", wait = FALSE)
 
 # Load comTradeDepth
-comTrade <- fread(input = "7z x -so E:/FMM/OMXS30Futures/TRTHv2/subsample201605/comTrade_5depth.csv.gz", header = TRUE, check.names=T)
+comTrade <- fread(input = "7z x -so G:/FMM/longperiod/comTrade_5depth.csv.gz", header = TRUE, check.names=T)
 
 # Drop matched spread contract from the comTrade data
 # fileDone <- list.files("E:/FMM/OMXS30Futures/TRTHv2/Table3_subsample/comRegTD/", pattern=".csv.gz", all.files=FALSE,full.names=FALSE)
 # fileDone <- data.table(X.RIC = tstrsplit(fileDone,split = "_")[[1]], Date = tstrsplit(fileDone,split = "_")[[2]])
 # comTrade <- comTrade[!paste0(X.RIC, Date) %in% paste0(fileDone$X.RIC, fileDone$Date),]
 
-# 3.Match spreads trades and regular trades and depth------------
+# 2.Match spreads trades and regular trades and depth------------
 # Traing data, both legs, are loaded in the function
 # Apply srTradeMatch function defined in TDmatch.R
 # Apply function by RIC and Date of the spreads trade
@@ -71,8 +70,8 @@ comTrade[, srTDMatch(comTrade[.I],
          by = .(X.RIC, Date)]
 
 comTrade[, srTDMatch(comTrade[.I],
-                     regTradeDir = "F:/FMM/subsample201605/FuturesTAQ/",
-                     regDepthDir = "F:/FMM/subsample201605/FuturesDepth/"),
+                     regTradeDir = "G:/FMM/subsample201605/FuturesTAQ/",
+                     regDepthDir = "G:/FMM/subsample201605/FuturesDepth/"),
          by = .(X.RIC, Date)]
 
 # Test without hard drive
@@ -82,9 +81,11 @@ comTrade[, srTDMatch(comTrade[.I],
          by = .(X.RIC, Date)]
 
 # Drop matched spread contract from the comTrade data
-fileDone <- list.files("F:/FMM/subsample201605/comRegTD/", pattern=".csv.gz", all.files=FALSE,full.names=FALSE)
+fileDone <- list.files("G:/FMM/subsample201605/comRegTD/", pattern=".csv.gz", all.files=FALSE,full.names=FALSE)
 fileDone <- data.table(X.RIC = tstrsplit(fileDone,split = "_")[[1]], Date = tstrsplit(fileDone,split = "_")[[2]])
-comTrade <- comFullTrade[!paste0(X.RIC, Date) %in% paste0(fileDone$X.RIC, fileDone$Date),]
+comTrade <- comTrade[paste0(X.RIC, Date) %in% paste0(fileDone$X.RIC, fileDone$Date),]
+
+# comTrade <- comFullTrade[!paste0(X.RIC, Date) %in% paste0(fileDone$X.RIC, fileDone$Date),]
 # table(comTrade$X.RIC, comTrade$Date)
 
 # If all spreads trades are matched with correct quotes
