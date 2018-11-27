@@ -101,7 +101,7 @@ loadTrades <- function(fileDir){
     # comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
     # comTrade <- comTrade[, chgAsk :=-diff(L1.AskSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
     # New approach to calculate depth size change
-    comDepth[, c("chgBid", "chgAsk"):= chgDepth(comDepth[.I,],comDepth[.I+1,]), by=.(X.RIC, Date)]
+    comTrade[, c("chgBid", "chgAsk"):= chgDepth(comTrade[.I,],comTrade[.I+1,]), by=.(X.RIC, Date)]
   }
   
   comTrade[, Date:=as.character(Date)]
