@@ -49,7 +49,7 @@ loadTrades <- function(fileDir){
                  "L10.BidPrice", "L10.BidSize", "L10.AskPrice", "L10.AskSize")
   
   # Drop redundant variables for TAQ data
-  if(grepl("TAQ", fileDir)) {
+  if(grepl("TAQ", fileDir)|grepl("Trades", fileDir)) {
     # Mark delayed delivery
     comTrade <- comTrade[grepl("221\\[IRGCOND\\]", Qualifiers) | grepl("230\\[IRGCOND\\]", Qualifiers), Type := "offExchange"]
     
