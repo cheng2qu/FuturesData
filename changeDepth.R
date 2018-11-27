@@ -35,6 +35,8 @@ chgDepth <- function(Depth0, Depth1){
 
 # Below is for testing
 
+# comDepth <- comDepth[, c("chgBid", "chgAsk"):= chgDepth(comDepth[.I,],comDepth[.I+1,]), by=.(X.RIC, Date)]
+
 # comDepth[2,c("L1.BidPrice","L2.BidPrice","L3.BidPrice","L4.BidPrice","L5.BidPrice")]
 # comDepth[2,c("L1.BidSize","L2.BidSize","L3.BidSize","L4.BidSize","L5.BidSize")]
 # 
