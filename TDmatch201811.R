@@ -947,25 +947,31 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
                           shortTrade$Volume==comTrade$Volume[i] &
                           shortTrade$matchedShort==0)
     if (i>1) {
+      # Ignore matched regular trades
       longIndex <- longIndex[which(longIndex>which.max(longTrade$matchedLong))]
       shortIndex <- shortIndex[which(shortIndex>which.max(shortTrade$matchedShort))]
     } 
     
     # Calculate the combined net price and time difference
     spreads <- longTrade[longIndex][, shortIndex, by=longIndex]
-    spreads <- spreads[, dPrice := round(longTrade[longIndex]$Price-shortTrade[shortIndex]$Price,2), by=.(longIndex,shortIndex)]
+    spreads <- spreads[, dPrice := round(longTrade[longIndex]$Price-shortTrade[shortIndex]$Price,2), by=.(longIndex,shortIndex)] 
+    # Spreads between long and short legs
     spreads <- spreads[, dSec := abs(longTrade[longIndex]$Second-shortTrade[shortIndex]$Second), by=.(longIndex,shortIndex)]
+    # Time difference between long and short legs
     spreads <- spreads[, dSecL := abs(longTrade[longIndex]$Second-comTrade$Second[i])]
+    # Time difference between long and spreads trade
     spreads <- spreads[, dSecS := abs(shortTrade[shortIndex]$Second-comTrade$Second[i])]
+    # Time difference between short and spreads trade
     spreads <- spreads[which(spreads$dPrice == comTrade$Price[i]),]
+    # Spreads price matches in two orderbooks
     
     if (i>1 & nrow(spreads)>0) {
-      spreads <- spreads[which(spreads$dPrice == comTrade$Price[i] &
-                                 spreads$dSec <= max(0.1,timeDiffL+timeDiffS) &
+      spreads <- spreads[which(spreads$dSec <= max(0.1,timeDiffL+timeDiffS) &
                                  spreads$dSecL <= max(0.1,timeDiffL) &
                                  spreads$dSecS <= max(0.1,timeDiffS))]
       spreads <- spreads[order(longIndex,shortIndex),]
       # spreads <- spreads[1,]
+      
       k <- length(which(comTrade$Second>comTrade$Second[i] & comTrade$Second<longTrade$Second[spreads$longIndex[1]] & comTrade$Price==comTrade$Price[i]))
       # Number of combo trades after i as a potential match to long trade
       
@@ -993,12 +999,13 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
       # Combine legs depth with combo trades 
       comTrade[i][,(longL10Depths)] <- longTrade[spreads$longIndex[1], ..L10Depths]
       comTrade[i][,(shortL10Depths)] <- shortTrade[spreads$shortIndex[1], ..L10Depths]
-      
+      next
       # Match depth data for best bid/ask prices
       # comTrade[i, c("priceLong","priceShort","bestBidLong", "bestAskLong", "bestBidShort", "bestAskShort")] <-
       #   cbind(longTrade$Price[spreads$longIndex[spreadIndex]],
       #         longTrade$Price[spreads$shortIndex[spreadIndex]])
-    }
+    
+      }
     
     # If find no match with the volume, considering split orders
     if ((length(longIndex)==0 | length(shortIndex)==0 | nrow(spreads)==0) & !is.na(comTrade$chgBid[i]) & !is.na(comTrade$chgAsk[i])) {
@@ -1023,6 +1030,7 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
                             abs(shortTrade$Second - comTrade$Second[i])<=max(0.5, timeDiffS) &
                             shortTrade$Volume == cumvol &
                             shortTrade$matchedShort==0)
+      
       if (length(longIndex)==0 | length(shortIndex)==0 | length(childNum)==0) {
         childNum <- which(comTrade$Second-comTrade$Second[i]>=0 &
                             comTrade$Second-comTrade$Second[i]<=0.5 &
@@ -1076,7 +1084,9 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
         # Combine legs depth with combo trades 
         comTrade[childNum][,(longL10Depths)] <- longTrade[spreads$longIndex[1], ..L10Depths]
         comTrade[childNum][,(shortL10Depths)] <- shortTrade[spreads$shortIndex[1], ..L10Depths]
+        next
       } else {
+        # Use closest match if still no regular legs found
         # print(paste0(comTrade$X.RIC[1],"_",comTrade$Date[1],"_",i))
         longIndex <- closestTrade(comTrade$Second[i],longTrade$Second, comTrade$Date[i])
         shortIndex <- closestTrade(comTrade$Second[i],shortTrade$Second, comTrade$Date[i])
