@@ -7,6 +7,8 @@ require(data.table)
 require(stringi) # Character string processing
 require(lubridate) # For date-time parsing function
 
+source(changeDepth.R) # Function for depth change
+
 # Function to convert UTC offset time to local time----
 toLocalTime <- function(Date.Time){
   # Input Date.Time format as "yyyy-mm-ddThh:mm:OSz"
@@ -96,8 +98,10 @@ loadTrades <- function(fileDir){
     comTrade <- comTrade[! apply( comTrade[, ..L10Depths] , 1 , function(x) all(is.na(x)) ) , ]
     
     # Chg. of depth as approx for trading volume
-    comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
-    comTrade <- comTrade[, chgAsk :=-diff(L1.AskSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
+    # comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
+    # comTrade <- comTrade[, chgAsk :=-diff(L1.AskSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
+    # New approach to calculate depth size change
+    comDepth[, c("chgBid", "chgAsk"):= chgDepth(comDepth[.I,],comDepth[.I+1,]), by=.(X.RIC, Date)]
   }
   
   comTrade[, Date:=as.character(Date)]
