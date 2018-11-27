@@ -30,12 +30,15 @@ chgDepth <- function(Depth0, Depth1){
   } else {
     chgAsk <- Depth0$L1.AskSize
   }
-  return(c(chgBid,chgAsk))
+  return(c("chgBid"=as.numeric(chgBid),"chgAsk"=as.numeric(chgAsk)))
+  
 }
 
 # Below is for testing
 
 # comDepth <- comDepth[, c("chgBid", "chgAsk"):= chgDepth(comDepth[.I,],comDepth[.I+1,]), by=.(X.RIC, Date)]
+# Depth0 <- comDepth[1,]
+# Depth1 <- comDepth[2,]
 
 # comDepth[2,c("L1.BidPrice","L2.BidPrice","L3.BidPrice","L4.BidPrice","L5.BidPrice")]
 # comDepth[2,c("L1.BidSize","L2.BidSize","L3.BidSize","L4.BidSize","L5.BidSize")]
