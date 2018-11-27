@@ -403,7 +403,7 @@ tdComMatch = function(comTrade, comDepth, output){
           # Considering split orders around time
           indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
                                 comDepth$Date==comTrade$Date[i]&
-                                comDepth$Second-comTrade$Second[i] >= -0.5&
+                                comDepth$Second>= comTrade$Second[i-1] &
                                 comDepth$Second-comTrade$Second[i] <= 0.5&
                                 ((comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$chgBid>=comTrade$Volume[i]) |
                                    (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk>=comTrade$Volume[i])))
@@ -444,7 +444,7 @@ tdComMatch = function(comTrade, comDepth, output){
       # Finding close time match in depth
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
                             comDepth$Date==comTrade$Date[i]&
-                            comDepth$Second-comTrade$Second[i] >= -0.5&
+                            comDepth$Second>= comTrade$Second[i-1] &
                             comDepth$Second-comTrade$Second[i] <= 0.5)
       
       if (length(indexDepth)==0) next
@@ -538,7 +538,7 @@ tdComMatch = function(comTrade, comDepth, output){
           # For those without match, try again using around time to Depth_{t-1}
           
           indexDepth <-  which(comDepth$Date.L.==comTrade$Date.L.[i]&
-                                 comDepth$Second-comTrade$Second[i] >-0.5 & comDepth$Second-comTrade$Second[i] < 0.5&
+                                 comDepth$Second>comTrade$Second[i-1]& comDepth$Second-comTrade$Second[i] < 0.5&
                                  ((comDepth$L2.BidPrice==comTrade$Price[i] &  shift(comDepth$L1.BidPrice, n=1L, type = "lag")==comTrade$Price[i] &
                                      shift(comDepth$L1.BidSize, n=1L, type = "lag")==comDepth$L2.BidSize + comTrade$Volume[i])|
                                     (comDepth$L2.AskPrice==comTrade$Price[i] &  shift(comDepth$L1.AskPrice, n=1L, type = "lag")==comTrade$Price[i] &
@@ -574,7 +574,7 @@ tdComMatch = function(comTrade, comDepth, output){
       
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i] &
                             comDepth$Date==comTrade$Date[i] &
-                            comDepth$Second-comTrade$Second[i] >-0.5 & comDepth$Second-comTrade$Second[i] < 0.5 &
+                            comDepth$Second>comTrade$Second[i-1] & comDepth$Second-comTrade$Second[i] < 0.5 &
                             ((comDepth$L1.BidPrice==comTrade$Price[i] &  shift(comDepth$L2.BidPrice, n=1L, type = "lead")==comTrade$Price[i])|
                                (comDepth$L1.AskPrice==comTrade$Price[i] &  shift(comDepth$L2.AskPrice, n=1L, type = "lead")==comTrade$Price[i])))
       
@@ -649,7 +649,7 @@ tdComMatch = function(comTrade, comDepth, output){
       
       indexDepth <- which(comDepth$X.RIC==comTrade$X.RIC[i] &
                             comDepth$Date==comTrade$Date[i] &
-                            comDepth$Second-comTrade$Second[i] >-0.5 & comDepth$Second-comTrade$Second[i] < 0.5)
+                            comDepth$Second>comTrade$Second[i-1] & comDepth$Second-comTrade$Second[i] < 0.5)
       
       if (length(indexDepth)==0) next
       for (d in indexDepth) {
@@ -704,7 +704,7 @@ tdComMatch = function(comTrade, comDepth, output){
       
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i] &
                             comDepth$Date==comTrade$Date[i] &
-                            comDepth$Second-comTrade$Second[i] >-0.5 & comDepth$Second-comTrade$Second[i] < 0.5)
+                            comDepth$Second>comTrade$Second[i-1] & comDepth$Second-comTrade$Second[i] < 0.5)
       
       if (length(indexDepth)==0) next
       
