@@ -89,7 +89,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
   # Matching with interval between chg. of depth where the trade happens
   for (i in 1:nrow(comTrade)) { #nrow(comTrade)
     # Skip matched lines
-    if (!is.na(comTrade$L1.BidPrice[i]) | comTrade$Type=="offExchange") next
+    if (!is.na(comTrade$L1.BidPrice[i]) | comTrade$Type[i]=="offExchange") next
     
     if(i==1){
       # If start from pre-trade or normal session
@@ -148,6 +148,13 @@ tdRegMatch <- function(longTrade, folderDepth) {
                              (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$chgAsk==comTrade$Volume[i])|
                              (comDepth$L1.BidPrice==comTrade$Price[i] & comDepth$L1.BidSize==comTrade$Volume[i]) |
                              (comDepth$L1.AskPrice==comTrade$Price[i] & comDepth$L1.AskSize==comTrade$Volume[i])))
+    if (length(indexDepth)>=1) {
+      # Assign the values if find matches
+      indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
+      comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
+      comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
+      next
+    }
     # 
     # # 2. Match to next depth if no trades happen in the interval====
     # if (length(indexDepth)==0) {
@@ -181,6 +188,13 @@ tdRegMatch <- function(longTrade, folderDepth) {
                             comDepth$L1.BidPrice<=comTrade$Price[i] & comDepth$L1.AskPrice>=comTrade$Price[i] &
                             (comDepth$chgBid==comTrade$Volume[i] | comDepth$chgAsk==comTrade$Volume[i] |
                                comDepth$L1.BidSize==comTrade$Volume[i] | comDepth$L1.AskSize==comTrade$Volume[i]))  
+      if (length(indexDepth)>=1) {
+        # Assign the values if find matches
+        indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
+        comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
+        comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
+        next
+      }
     }
     
     # 4. Only consider quote bounds and time====
@@ -270,7 +284,12 @@ tdRegMatch <- function(longTrade, folderDepth) {
         }
       }
     }
-    
+    if (length(indexDepth)>=1) {
+      # Assign the values if find matches
+      indexDepth <- indexDepth[which.min(abs(comDepth$Second[indexDepth]-comTrade$Second[i]))]
+      comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comDepth[indexDepth, c("L1.BidPrice","L1.AskPrice","chgBid","chgAsk")]
+      comTrade[i][,(L10Depths)] <- comDepth[indexDepth, ..L10Depths]
+    }
     # If there is still no match, discuss later
   }
   
@@ -884,8 +903,8 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
     longTrade <- comTrade[, c("X.RIC","Type","Price","Volume","Date","Time","Second")]
     longTrade$X.RIC <- longRIC
     longTrade$Type <- "Trade"
-    longTrade$Price <- NA
-    longTrade$Volume <- NA
+    longTrade$Price <- as.numeric(NA)
+    longTrade$Volume <- as.numeric(NA)
   }
   longTrade <- tdRegMatch(longTrade, folderDepth = regDepthDir)
   shortTrade <- tdRegMatch(shortTrade, folderDepth = regDepthDir)
@@ -927,8 +946,9 @@ srTDMatch = function(comTrade, regTradeDir, regDepthDir) {
   # and allowing for split trades
   longTrade$matchedLong <- 0
   shortTrade$matchedShort <- 0
-  comTrade[,(longL10Depths)] <- numeric(0)
-  comTrade[,(shortL10Depths)] <- numeric(0)
+  comTrade[, c("priceLong", "priceShort")] <- as.numeric(NA)
+  comTrade[,(longL10Depths)] <- as.numeric(NA)
+  comTrade[,(shortL10Depths)] <- as.numeric(NA)
   for (i in 1:nrow(comTrade)) { #nrow(comTrade)
     
     if (i <= max(longTrade$matchedLong)) next
