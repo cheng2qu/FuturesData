@@ -228,7 +228,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
           if(!is.na(comTrade[i-1, L2.BidPrice])) {
             if(comTrade[i-1, L2.BidPrice]==comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L2.BidPrice","L1.AskPrice","L2.BidSize","chgAsk")]
-              comTrade[i][,(L10Depths)] <- ttDepth("B", comTrade[i-1][,(L10Depths)])
+              comTrade[i][,(L10Depths)] <- ttDepth("B", comTrade[i-1, ..L10Depths])
               next
             }
           }
@@ -236,7 +236,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
           if(!is.na(comTrade[i-1, L2.AskPrice])) {
             if(comTrade[i-1,L2.AskPrice]==comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L1.BidPrice","L2.AskPrice","chgBid","L2.AskSize")]
-              comTrade[i][,(L10Depths)] <- ttDepth("A", comTrade[i-1][,(L10Depths)])
+              comTrade[i][,(L10Depths)] <- ttDepth("A", comTrade[i-1, ..L10Depths])
               next
             }
           }
@@ -244,7 +244,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
           if(!is.na(comTrade[i-1, L2.BidPrice]) & !is.na(comTrade[i-1, L1.AskPrice])) {
             if(comTrade[i-1, L2.BidPrice]<=comTrade$Price[i] & comTrade[i-1, L1.AskPrice]>=comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L2.BidPrice","L1.AskPrice","L2.BidSize","chgAsk")]
-              comTrade[i][,(L10Depths)] <-  ttDepth("B", comTrade[i-1][,(L10Depths)])
+              comTrade[i][,(L10Depths)] <-  ttDepth("B", comTrade[i-1, ..L10Depths])
               next
             }
           }
@@ -252,7 +252,7 @@ tdRegMatch <- function(longTrade, folderDepth) {
           if(!is.na(comTrade[i-1, L1.BidPrice]) & !is.na(comTrade[i-1, L2.AskPrice])) {
             if(comTrade[i-1, L1.BidPrice]<=comTrade$Price[i] & comTrade[i-1,L2.AskPrice]>=comTrade$Price[i]) {
               comTrade[i, c("bestBid", "bestAsk", "chgBid", "chgAsk")] <- comTrade[i-1, c("L1.BidPrice","L2.AskPrice","chgBid","L2.AskSize")]
-              comTrade[i][,(L10Depths)] <- ttDepth("A", comTrade[i-1][,(L10Depths)])
+              comTrade[i][,(L10Depths)] <- ttDepth("A", comTrade[i-1, ..L10Depths])
               next
             }
           }
