@@ -76,8 +76,8 @@ loadTrades <- function(fileDir){
     
     # Adding columns for depth data
     # comTrade[,(L10Depths)] <- NULL 
-    comTrade[,c("bestBid", "bestAsk", "chgBid","chgAsk")] <- numeric(0)
-    comTrade[,(L10Depths)] <- numeric(0)
+    comTrade[,c("bestBid", "bestAsk", "chgBid","chgAsk")] <- as.numeric(NA)
+    comTrade[,(L10Depths)] <- as.numeric(NA)
   }
   
   # Drop redundant variables for Depth data
@@ -101,7 +101,7 @@ loadTrades <- function(fileDir){
     # comTrade <- comTrade[, chgBid :=-diff(L1.BidSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
     # comTrade <- comTrade[, chgAsk :=-diff(L1.AskSize, lag = 1, differences = 1), by=.(X.RIC, Date)]
     # New approach to calculate depth size change
-    comTrade[, c("chgBid", "chgAsk"):= chgDepth(comTrade[.I,],comTrade[.I+1,]), by=.(X.RIC, Date)]
+    comTrade[, c("chgBid", "chgAsk"):= chgDepth(comTrade), by=.(X.RIC, Date)]
   }
   
   comTrade[, Date:=as.character(Date)]
