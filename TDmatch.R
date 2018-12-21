@@ -528,7 +528,7 @@ tdComMatch = function(comTrade, comDepth, output){
       # Finding close time match in depth
       indexDepth <- which(comDepth$X.RIC == comTrade$X.RIC[i]&
                             comDepth$Date==comTrade$Date[i]&
-                            comDepth$Second-comTrade$Second[i] >= -0.5&
+                            comDepth$Second>= comTrade$Second[i-1] &
                             comDepth$Second-comTrade$Second[i] <= 0.5)
       
       if (length(indexDepth)==0) next
